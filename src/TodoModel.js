@@ -1,5 +1,6 @@
+import Utils from './Utils'
+
 export default class TodoModel {
-    static i = 0;
 
     /**
      * @param {string} storageId
@@ -8,13 +9,6 @@ export default class TodoModel {
         this.storageId = storageId;
         this.storage = window.localStorage;
         this.todos = this.fetchAll(storageId)
-    }
-
-    /**
-     * Crée un système d'auto increment
-     **/
-    static increment () {
-        return this.i++
     }
 
     /**
@@ -27,17 +21,17 @@ export default class TodoModel {
         return (store && JSON.parse(store)) || [];
     }
 
-    addTodo (title): void {
+    addTodo (title) {
         this.todos = [{
-            id: TodoModel.increment(),
+            id: Utils.uuid(),
             title: title,
             completed: false
-        }, ...this.todos]
+        }, ...this.todos];
 
         this.save(this.storageId, this.todos)
     }
 
-    save (storageId, data): void {
+    save (storageId, data) {
         if (data) {
             return this.storage.setItem(storageId, JSON.stringify(data));
         }
@@ -49,12 +43,42 @@ export default class TodoModel {
      * @public
      */
     toggle (todoToToggle, callback) {
-        console.log(todoToToggle)
         this.todos = this.todos.map(todo => todo.id === todoToToggle.id ? { ...todo, completed: !todo.completed } : todo)
         this.save(this.storageId, this.todos);
-        console.table(this.todos)
         if (callback) {
             callback(this.todos);
         }
+    }
+
+    /**
+     * @param {Todo} todoToRemove
+     * @param {Function} callback
+     * @public
+     */
+    remove (todoToRemove, callback) {
+        this.todos = this.todos.filter(todo => todo.id !== todoToRemove.id)
+        this.save(this.storageId, this.todos);
+        if (callback) {
+            callback(this.todos);
+        }
+    }
+
+    /**
+     * @param {Todo} todo
+     * @param {string} title
+     */
+    updateTitle (todo, title) {
+        this.todos = this.todos.map(t => t === todo ? { ...t, title } : t)
+        this.inform()
+    }
+
+    toggleAll (completed = true) {
+        this.todos = this.todos.map(t => completed !== t.completed ? { ...t, completed } : t)
+        this.inform()
+    }
+
+    clearCompleted () {
+        this.todos = this.todos.filter(t => !t.completed)
+        this.inform()
     }
 }
