@@ -1,12 +1,57 @@
-import React from "react";
+import React from 'react';
+import classNames from 'classnames'
 
 export default class TodoItem extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            editText: ''
+        };
     }
 
-    render() {
-        return <li className={this.props.todo.completed? 'completed' : ''}>
+    handleKeyDown = (event) => {
+        if (event.key === 'Escape') {
+            this.setState({editText: this.props.todo.title});
+            this.props.onCancel(event);
+        } else if (event.key === 'Enter') {
+            this.handleSubmit(event);
+        }
+    };
+
+    handleSubmit = (event) => {
+        let val = this.state.editText.trim();
+        if (val) {
+            this.props.onSave(val);
+            this.setState({editText: val});
+        } else {
+            this.props.onDestroy();
+        }
+    };
+
+    handleEdit = (event) => {
+        this.props.onUpdate();
+        this.setState({editText: this.props.todo.title});
+    };
+
+    handleChange = (event) => {
+        if (this.props.editing) {
+            this.setState({editText: event.target.value});
+        }
+    };
+
+   shouldComponentUpdate(nextProps, nextState) {
+        return (
+            nextProps.todo !== this.props.todo ||
+            nextProps.editing !== this.props.editing ||
+            nextState.editText !== this.state.editText
+        );
+   };
+
+   render() {
+        return <li className={classNames({
+                    completed: this.props.todo.completed,
+                    editing: this.props.editing
+               })}>
                 <div className="view">
                     <input
                         className="toggle"
@@ -22,11 +67,11 @@ export default class TodoItem extends React.Component {
                 <input
                     ref="editField"
                     className="edit"
-                    // value={this.state.editText}
-                    // onBlur={this.handleSubmit}
-                    // onChange={this.handleChange}
-                    // onKeyDown={this.handleKeyDown}
+                    value={this.state.editText}
+                    onBlur={this.handleSubmit}
+                    onChange={this.handleChange}
+                    onKeyDown={this.handleKeyDown}
                 />
         </li>
-    }
+   }
 }

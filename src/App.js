@@ -10,16 +10,22 @@ class TodoList extends React.Component {
         super(props);
 
         this.state = {
-            todos: props.model.fetchAll()
+            todos: props.model.fetchAll(),
+            newTodo: ''
         };
     }
+
 
     updateTodos = (todos) => {
         this.setState({todos: todos})
     };
 
+    updateTitle = (todo) => {
+        this.setState({editing: todo.id});
+    };
+
     updateNewTodo = (event) => {
-        this.setState({newTodo: event.target.value})
+        this.setState({newTodo: event.target.value});
     };
 
     addTodo = (event) => {
@@ -31,7 +37,7 @@ class TodoList extends React.Component {
 
         let title = this.state.newTodo.trim();
         if (title) {
-            this.props.model.addTodo(title);
+            this.props.model.addTodo(title, this.updateTodos);
             this.setState({newTodo: ''});
         }
     };
@@ -46,6 +52,11 @@ class TodoList extends React.Component {
         this.props.model.toggle(todoToToggle, this.updateTodos);
     };
 
+    save = (todoToSave, text) => {
+        this.props.model.updateTitle(todoToSave, text);
+        this.setState({editing: null});
+    };
+
     /**
      * Handle toggle remove toto from list.
      *
@@ -56,8 +67,12 @@ class TodoList extends React.Component {
         this.props.model.remove(todoToRemove, this.updateTodos);
     };
 
+    editCancel = (event) => {
+        this.setState({editing: false});
+    };
+
     render () {
-        let {todos, newTodo} = this.state;
+        let {todos} = this.state;
 
         return (
             <section className="todoapp">
@@ -65,7 +80,7 @@ class TodoList extends React.Component {
                     <h1>todos</h1>
                     <input
                         className="new-todo"
-                        value={newTodo}
+                        value={this.state.newTodo}
                         onKeyPress={this.addTodo}
                         onChange={this.updateNewTodo}
                         placeholder="What needs to be done?"
@@ -80,9 +95,12 @@ class TodoList extends React.Component {
                             return <TodoItem
                                 todo={todo}
                                 key={todo.id}
+                                editing={this.state.editing === todo.id}
                                 onToggle={this.toggleTodo.bind(this, todo)}
+                                onSave={this.save.bind(this, todo)}
                                 onDestroy={this.destroyTodo.bind(this, todo)}
-                                onUpdate={this.updateTitle}
+                                onUpdate={this.updateTitle.bind(this, todo)}
+                                onCancel={this.editCancel}
                             />
                         })}
                     </ul>

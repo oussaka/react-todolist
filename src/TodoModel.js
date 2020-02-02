@@ -21,14 +21,17 @@ export default class TodoModel {
         return (store && JSON.parse(store)) || [];
     }
 
-    addTodo (title) {
+    addTodo (title, callback) {
         this.todos = [{
             id: Utils.uuid(),
             title: title,
             completed: false
         }, ...this.todos];
 
-        this.save(this.storageId, this.todos)
+        this.save(this.storageId, this.todos);
+        if (callback) {
+            callback(this.todos);
+        }
     }
 
     save (storageId, data) {
@@ -68,17 +71,15 @@ export default class TodoModel {
      * @param {string} title
      */
     updateTitle (todo, title) {
-        this.todos = this.todos.map(t => t === todo ? { ...t, title } : t)
-        this.inform()
+        this.todos = this.todos.map(t => Object.entries(t).toString() === Object.entries(todo).toString() ? { ...t, title } : t)
+        this.save(this.storageId, this.todos);
     }
 
     toggleAll (completed = true) {
         this.todos = this.todos.map(t => completed !== t.completed ? { ...t, completed } : t)
-        this.inform()
     }
 
     clearCompleted () {
         this.todos = this.todos.filter(t => !t.completed)
-        this.inform()
     }
 }
