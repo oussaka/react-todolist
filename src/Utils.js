@@ -13,5 +13,9 @@ export default class Utils {
         }
 
         return uuid;
-    }
+    };
+
+    static pluralize(activeItems, word) {
+        return (activeItems === 1)? word : word+'s';
+    };
 }

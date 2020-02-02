@@ -1,11 +1,17 @@
 import React from 'react';
-import TodoItem from './TodoItem'
+import TodoItem from './TodoItem';
+import TodoFooter from './Footer';
 import './App.css';
-import 'todomvc-app-css/index.css'
+import 'todomvc-app-css/index.css';
 
 const ENTER_KEY = 'Enter';
 
 class TodoList extends React.Component {
+
+    static ALL_TODOS = 'all';
+    static ACTIVE_TODOS = 'active';
+    static COMPLETED_TODOS = 'completed';
+
     constructor(props) {
         super(props);
 
@@ -74,6 +80,11 @@ class TodoList extends React.Component {
     render () {
         let {todos} = this.state;
 
+        let activeTodoCount = todos.reduce(function (accum, todo) {
+            return todo.completed ? accum : accum + 1;
+        }, 0);
+        let completedCount = todos.length - activeTodoCount;
+
         return (
             <section className="todoapp">
                 <header className="header">
@@ -105,6 +116,12 @@ class TodoList extends React.Component {
                         })}
                     </ul>
                 </section>
+                <TodoFooter
+                    count={activeTodoCount}
+                    completedCount={completedCount}
+                    nowShowing={this.state.nowShowing}
+                    onClearCompleted={this.clearCompleted}
+                />
             </section>
         );
     }
