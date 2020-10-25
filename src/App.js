@@ -1,7 +1,6 @@
 import React from 'react';
 import TodoItem from './TodoItem';
 import TodoFooter from './Footer';
-import './App.css';
 import 'todomvc-app-css/index.css';
 
 const ENTER_KEY = 'Enter';

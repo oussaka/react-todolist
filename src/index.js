@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import TodoList from './App';
 import TodoModel from "./TodoModel";
 import * as serviceWorker from './serviceWorker';
