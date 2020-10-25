@@ -13,12 +13,18 @@ class TodoList extends React.Component {
 
     constructor(props) {
         super(props);
-
         this.state = {
-            todos: props.model.fetchAll(),
-            newTodo: ''
+            todos: [],
+            newTodo: '',
+            nowShowing: 'all'
         };
     }
+
+    componentDidMount() {
+        this.setState({
+            todos: this.props.model.fetchAll()
+        })
+    };
 
     updateTodos = (todos) => {
         this.setState({todos: todos})
@@ -80,10 +86,24 @@ class TodoList extends React.Component {
         this.props.model.toggleAll(checked, this.updateTodos);
     };
 
+    setFilter = (nowShowing) => {
+        this.setState({
+            nowShowing
+        })
+    };
+
     render () {
-        // TODO to fix!
-        // let {todos} = this.state;
         let todos = this.props.model.todos;
+        let shownTodos = todos.filter(function (todo) {
+            switch (this.state.nowShowing) {
+                case TodoList.ACTIVE_TODOS:
+                    return !todo.completed;
+                case TodoList.COMPLETED_TODOS:
+                    return todo.completed;
+                default:
+                    return true;
+            }
+        }, this);
 
         let activeTodoCount = todos.reduce(function (accum, todo) {
             return todo.completed ? accum : accum + 1;
@@ -108,7 +128,7 @@ class TodoList extends React.Component {
                            onChange={this.toggleAll} checked={activeTodoCount === 0}/>}
                     <label htmlFor="toggle-all">Mark all as complete</label>
                     <ul className="todo-list">
-                        {todos.map(todo => {
+                        {shownTodos.map(todo => {
                             return <TodoItem
                                 todo={todo}
                                 key={todo.id}
@@ -126,6 +146,7 @@ class TodoList extends React.Component {
                     count={activeTodoCount}
                     completedCount={completedCount}
                     nowShowing={this.state.nowShowing}
+                    filter={this.setFilter}
                     onClearCompleted={this.clearCompleted}
                 />
             </section>
