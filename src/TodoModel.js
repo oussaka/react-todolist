@@ -41,19 +41,6 @@ export default class TodoModel {
     }
 
     /**
-     * @param {Todo} todoToToggle
-     * @param {Function} callback
-     * @public
-     */
-    toggle (todoToToggle, callback) {
-        this.todos = this.todos.map(todo => todo.id === todoToToggle.id ? { ...todo, completed: !todo.completed } : todo)
-        this.save(this.storageId, this.todos);
-        if (callback) {
-            callback(this.todos);
-        }
-    }
-
-    /**
      * @param {Todo} todoToRemove
      * @param {Function} callback
      * @public
@@ -75,8 +62,25 @@ export default class TodoModel {
         this.save(this.storageId, this.todos);
     }
 
-    toggleAll (completed = true) {
-        this.todos = this.todos.map(t => completed !== t.completed ? { ...t, completed } : t)
+    /**
+     * @param {Todo} todoToToggle
+     * @param {Function} callback
+     * @public
+     */
+    toggle (todoToToggle, callback) {
+        this.todos = this.todos.map(
+            todo => todo.id === todoToToggle.id ? {...todo, completed: !todo.completed} : todo
+        )
+        this.save(this.storageId, this.todos);
+        if (callback) {
+            callback(this.todos);
+        }
+    }
+
+    toggleAll (completed = true, callback) {
+        this.todos.map(
+            todo => completed !== todo.completed ? this.toggle({...todo, completed}, callback) : todo
+        )
     }
 
     clearCompleted () {

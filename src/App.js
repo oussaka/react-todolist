@@ -20,7 +20,6 @@ class TodoList extends React.Component {
         };
     }
 
-
     updateTodos = (todos) => {
         this.setState({todos: todos})
     };
@@ -47,16 +46,6 @@ class TodoList extends React.Component {
         }
     };
 
-    /**
-     * Handle toggle complete toto from list.
-     *
-     * @param {Todo} todoToToggle
-     * @public
-     */
-    toggleTodo(todoToToggle) {
-        this.props.model.toggle(todoToToggle, this.updateTodos);
-    };
-
     save = (todoToSave, text) => {
         this.props.model.updateTitle(todoToSave, text);
         this.setState({editing: null});
@@ -76,8 +65,25 @@ class TodoList extends React.Component {
         this.setState({editing: false});
     };
 
+    /**
+     * Handle toggle complete toto from list.
+     *
+     * @param {Todo} todoToToggle
+     * @public
+     */
+    toggleTodo = (todoToToggle) => {
+        this.props.model.toggle(todoToToggle, this.updateTodos);
+    };
+
+    toggleAll = (event) => {
+        let checked = event.target.checked;
+        this.props.model.toggleAll(checked, this.updateTodos);
+    };
+
     render () {
-        let {todos} = this.state;
+        // TODO to fix!
+        // let {todos} = this.state;
+        let todos = this.props.model.todos;
 
         let activeTodoCount = todos.reduce(function (accum, todo) {
             return todo.completed ? accum : accum + 1;
@@ -98,7 +104,8 @@ class TodoList extends React.Component {
                 </header>
                 <section className="main">
                     {todos.length > 0 &&
-                    <input className="toggle-all" type="checkbox" onChange={this.toggle}/>}
+                    <input id="toggle-all" className="toggle-all" type="checkbox"
+                           onChange={this.toggleAll} checked={activeTodoCount === 0}/>}
                     <label htmlFor="toggle-all">Mark all as complete</label>
                     <ul className="todo-list">
                         {todos.map(todo => {
