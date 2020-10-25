@@ -1,5 +1,5 @@
 # react-todolist
-TodoList react App
+TodoList react App deployed in heroku https://reactjs-todoapp.herokuapp.com
 
 ## Available Scripts
 
